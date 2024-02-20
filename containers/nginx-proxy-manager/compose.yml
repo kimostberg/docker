@@ -1,0 +1,52 @@
+version: "3"
+
+networks:
+  frontend:
+    external: true  # add this if the network is already existing!
+  backend:
+    external: false
+  
+services:    # First time login Email:    admin@example.com
+  npm-app:   # First time login Password: changeme
+    container_name: ${CONTNAME}
+    hostname: ${CONTNAME}
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      # These ports are in format <host-port>:<container-port>
+      - '80:80' # Public HTTP Port
+      - '443:443' # Public HTTPS Port
+      - '8081:81' # Admin Web Port
+      # Add any other Stream port you want to expose
+      # - '21:21' # FTP
+    environment:
+      DB_MYSQL_HOST: "${CONTNAME}-db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: ${CONTNAME}
+      DB_MYSQL_PASSWORD: ${DATABASE_PASSWORD} # Change this. Has to same as npm-db MYSQL_PASSWORD
+      DB_MYSQL_NAME: ${CONTNAME}
+      # Uncomment this if IPv6 is not enabled on your host
+      # DISABLE_IPV6: 'true'
+    volumes:
+        - /etc/localtime:/etc/localtime:ro
+        - ./data:/data
+        - ./letsencrypt:/etc/letsencrypt
+    networks:
+        - frontend
+        - backend
+
+  npm-db:
+    container_name: "${CONTNAME}-db"
+    hostname: "${CONTNAME}-db"
+    image: 'jc21/mariadb-aria:latest'
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # Change this
+      MYSQL_DATABASE: ${CONTNAME}
+      MYSQL_USER: ${CONTNAME}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD} # Change this
+    volumes:
+        - /etc/localtime:/etc/localtime:ro    
+        - ./mysql:/var/lib/mysql
+    networks:
+        - backend
