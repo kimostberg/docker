@@ -1,0 +1,23 @@
+version: "2.1"
+services:
+  resilio-sync:
+    image: lscr.io/linuxserver/resilio-sync:latest
+    container_name: resilio-sync
+    environment:
+      - PUID=1000
+      - PGID=996
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config:/config
+      - ./downloads:/downloads
+      - ./sync:/sync
+    ports:
+      - 8889:8888
+      - 55555:55555
+    restart: unless-stopped
+    networks:
+      - frontend
+
+networks:
+  frontend: 
+    external: true # add this if the network is already existing!
