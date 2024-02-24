@@ -1,0 +1,15 @@
+version: "3"
+services:
+  cloudflare-ddns:
+    container_name: ${CONTNAME}
+    hostname: ${CONTNAME}
+    image: oznu/cloudflare-ddns:latest
+    restart: always
+    environment:
+      - API_KEY=${CF_API_TOKEN}
+      - ZONE=${DOMAINS}
+#      - SUBDOMAIN=subdomain
+      - PROXIED=${PROXIED}
+    network_mode: host
+    dns: 
+      - ${DNS}
