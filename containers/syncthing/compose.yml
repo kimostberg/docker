@@ -1,0 +1,27 @@
+version: "3"
+
+networks:
+  frontend: 
+    external: true # add this if the network is already existing!
+
+services:
+  syncthing:
+    image: linuxserver/syncthing:latest
+    container_name: ${CONTNAME}
+    hostname: ${CONTNAME}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data:/config
+      - ./sync:/sync
+    ports:
+      - ${WEBPORT}:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    restart: unless-stopped    
+    networks:
+      - frontend
+    dns: ${DNS}
