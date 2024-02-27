@@ -17,8 +17,8 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - /mnt:/mnt:z
-      - /mnt2:/mnt2:z
+      - ./mnt:/mnt:z
+      - ./mnt2:/mnt2:z
     command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
     networks:
       - frontend
