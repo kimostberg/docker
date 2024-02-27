@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  samba:
+    build: .
+    image: kimostberg/samba
+    restart: unless-stopped
+    container_name: samba
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"
+    read_only: true
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
+    volumes:
+      - /mnt:/mnt:z
+      - /mnt2:/mnt2:z
+    command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
+    networks:
+      - frontend
+
+networks:
+  frontend: 
+    external: true # add this if the network is already existing!
