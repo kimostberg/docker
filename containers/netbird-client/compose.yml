@@ -1,0 +1,19 @@
+name: netbird
+
+networks:
+    frontend:
+        external: true
+
+services:
+  netbird:
+    container_name: ${CLIENT_NAME}
+    hostname: ${CLIENT_NAME}
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - NB_SETUP_KEY=${NB_SETUP_KEY}
+    volumes:
+      - ./data:/etc/netbird
+    image: netbirdio/netbird:latest
+    networks:
+      - frontend
