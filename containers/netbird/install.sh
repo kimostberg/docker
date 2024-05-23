@@ -11,3 +11,5 @@ echo $LATEST_TAG
 
 # this command will clone the latest tag
 git clone --depth 1 --branch $LATEST_TAG $REPO
+cd netbird/infrastructure_files/
+cp setup.env.example setup.env
