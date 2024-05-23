@@ -6,12 +6,13 @@ networks:
 
 services:
   netbird:
-    container_name: ${CLIENT_NAME}
-    hostname: ${CLIENT_NAME}
+    container_name: ${CLIENT_NAME:-netbird}
+    hostname: ${CLIENT_NAME:-netbird}
     cap_add:
       - NET_ADMIN
     environment:
-      - NB_SETUP_KEY=${NB_SETUP_KEY}
+      - NB_SETUP_KEY=${SETUP_KEY}
+      - NB_MANAGEMENT_URL=${MANAGEMENT_URL:-https://app.netbird.io:443}
     volumes:
       - ./data:/etc/netbird
     image: netbirdio/netbird:latest
