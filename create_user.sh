@@ -11,8 +11,9 @@ fi
 adduser "$username"
 
 if [ $? -eq 0 ]; then
-  echo "Adding user $username to sudo group..."
+  echo "Adding user $username to sudo and docker groups..."
   usermod -aG sudo "$username"
+  usermod -aG docker "$username"
 else
   echo "Failed to create user $username, exiting..."
   exit 1
