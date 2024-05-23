@@ -8,7 +8,7 @@ if id -u "$username" >/dev/null 2>&1; then
   exit 1
 fi
 
-adduser /bin/bash "$username"
+adduser "$username"
 
 if [ $? -eq 0 ]; then
   echo "Adding user $username to sudo group..."
