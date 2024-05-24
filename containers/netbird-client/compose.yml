@@ -18,3 +18,4 @@ services:
     image: netbirdio/netbird:latest
     networks:
       - frontend
+    restart: unless-stopped
