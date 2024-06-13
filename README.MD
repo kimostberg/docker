@@ -16,9 +16,9 @@ If you run commands below, it will download the backup script to /docker and sch
 cd /docker
 wget https://raw.githubusercontent.com/kimostberg/docker/main/backup.sh
 chmod +x backup.sh
-crontab -l > addbackup2cron
-echo 0 1 * * * /docker/backup.sh >> addbackup2cron
-crontab addbackup2cron
-rm addbackup2cron
+sudo crontab -l > addbackup2cron
+sudo echo 0 1 * * * /docker/backup.sh >> addbackup2cron
+sudo crontab addbackup2cron
+sudo rm addbackup2cron
 
 ```
