@@ -10,7 +10,7 @@ chmod +x create_user.sh
 ./create_user.sh
 ```
 
-This is backup script for docker. By default it will create look for compose.yml files from /docker subfolders. When it finds the file it will shutdown container, copy whole folder to /backup and then start containers again. 
+This is backup script for docker. By default it will look for compose.yml files from /docker subfolders. When it finds the file it will shutdown container, copy whole folder to /backup and then start containers again. 
 If you run commands below, it will download the backup script to /docker and schedule it to run every night at 1:00
 ```
 cd /docker
