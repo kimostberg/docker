@@ -1,0 +1,56 @@
+name: ${CONTAINER_NAME}
+secrets:
+  cf-token:
+    file: ./cf-token
+services:
+  traefik:
+    image: traefik:latest # or traefik:v3.3 to pin a version
+    container_name: ${CONTAINER_NAME}
+    hostname: ${CONTAINER_NAME}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true # helps to increase security
+    secrets:
+      - cf-token # the secret at the top of this file
+    env_file:
+      - .env # store other secrets e.g., dashboard password
+    networks:
+       frontend:
+    ports:
+      - 80:80
+      - 443:443
+     # - 10000:10000 # optional
+     # - 33073:33073 # optional
+    environment:
+      - TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
+      # - CF_API_EMAIL=your@email.com # Cloudflare email
+      # - CF_DNS_API_TOKEN=YOUR-TOKEN # Cloudflare API Token
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf-token # see https://doc.traefik.io/traefik/https/acme/#providers
+      # token file is the proper way to do it
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/traefik.yaml:/traefik.yaml:ro
+      - ./config/acme.json:/acme.json
+      - ./config/config.yaml:/config.yaml:ro
+      - ./logs:/var/log/traefik
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLE}"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`${CONTAINER_NAME}.${DOMAIN}`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`${CONTAINER_NAME}.${DOMAIN}`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=${DOMAIN}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.${DOMAIN}"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+networks:
+  frontend:
+    external: true # or comment this line to auto create the network
