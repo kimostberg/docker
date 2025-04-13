@@ -48,4 +48,7 @@ docker network create \
   --driver=bridge \
   --subnet=172.20.0.0/16 \
   --gateway=172.20.0.1 \
+  --ipv6 \
+  --subnet=fd00:172:20::/64 \
+  --gateway=fd00:172.20::1
   frontend
