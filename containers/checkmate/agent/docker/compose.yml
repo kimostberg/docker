@@ -1,0 +1,7 @@
+services:
+  capture:
+    image: ghcr.io/bluewave-labs/capture:latest
+    ports:
+        - ${PORT}:59232
+    env_file:
+        - .env
