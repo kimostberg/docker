@@ -1,0 +1,29 @@
+name: ${CONTAINER_NAME}
+
+services:
+  it-tools:
+    #build:
+    #  context: ./git
+    #  dockerfile: Dockerfile
+    restart: unless-stopped
+    image: 'corentinth/it-tools:latest'
+    container_name: ${CONTAINER_NAME}
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLE}"
+      - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=http"
+      - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${CONTAINER_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.middlewares.${CONTAINER_NAME}-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.${CONTAINER_NAME}.middlewares=${CONTAINER_NAME}-https-redirect"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.entrypoints=https"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.rule=Host(`${CONTAINER_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.tls=true"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.service=${CONTAINER_NAME}"
+      - "traefik.http.services.${CONTAINER_NAME}.loadbalancer.server.port=80"
+      - "traefik.docker.network=frontend"
+    env_file:
+      - .env
+    networks:
+      - frontend
+networks:
+  frontend:
+    external: true 
