@@ -9,13 +9,14 @@ services:
         container_name: ${CONTAINER_NAME}
         restart: unless-stopped
         volumes:
+            - /etc/localtime:/etc/localtime:ro
             - '/var/run/docker.sock:/var/run/docker.sock'
             - './data:/data'
         image: 'portainer/portainer-ce:latest'
         env_file:
         - .env
         labels:
-        - "traefik.enable=true"
+        - "traefik.enable=${TRAEFIK_ENABLE}"
         - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=http"
         - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${CONTAINER_NAME}.${DOMAIN}`)"
         - "traefik.http.middlewares.${CONTAINER_NAME}-https-redirect.redirectscheme.scheme=https"
