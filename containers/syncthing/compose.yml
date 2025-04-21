@@ -1,27 +1,45 @@
-version: "3"
-
-networks:
-  frontend: 
-    external: true # add this if the network is already existing!
+name: syncthing
 
 services:
   syncthing:
-    image: linuxserver/syncthing:latest
-    container_name: ${CONTNAME}
-    hostname: ${CONTNAME}
+    #image: linuxserver/syncthing:built
+    build:
+      context: ./git
+      dockerfile: Dockerfile
+    container_name: ${CONTAINER_NAME}
+    hostname: ${CONTAINER_NAME}
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./data:/config
-      - ./sync:/sync
+      - ./config:/config
+      - ${SYNC_FOLDER}:/sync
     ports:
-      - ${WEBPORT}:8384
+    #  - ${WEBPORT}:8384
       - 22000:22000/tcp
       - 22000:22000/udp
       - 21027:21027/udp
     restart: unless-stopped    
     networks:
       - frontend
+    #network_mode: host
     dns: ${DNS}
+    labels:
+      - "traefik.enable=${TRAEFIK_ENABLE}"
+      - "traefik.http.routers.${CONTAINER_NAME}.entrypoints=http"
+      - "traefik.http.routers.${CONTAINER_NAME}.rule=Host(`${CONTAINER_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.middlewares.${CONTAINER_NAME}-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.${CONTAINER_NAME}.middlewares=${CONTAINER_NAME}-https-redirect"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.entrypoints=https"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.rule=Host(`${CONTAINER_NAME}.${TRAEFIK_DOMAIN}`)"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.tls=true"
+      - "traefik.http.routers.${CONTAINER_NAME}-secure.service=${CONTAINER_NAME}"
+      - "traefik.http.services.${CONTAINER_NAME}.loadbalancer.server.port=8384"
+      - "traefik.docker.network=frontend"
+    env_file:
+      - .env
+
+networks:
+  frontend: 
+    external: true # add this if the network is already existing!
