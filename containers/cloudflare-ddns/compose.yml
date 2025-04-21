@@ -1,15 +1,39 @@
-version: "3"
 services:
   cloudflare-ddns:
-    container_name: ${CONTNAME}
-    hostname: ${CONTNAME}
-    image: oznu/cloudflare-ddns:latest
-    restart: always
-    environment:
-      - API_KEY=${CF_API_TOKEN}
-      - ZONE=${DOMAINS}
-      - SUBDOMAIN=${SUBDOMAIN}
-      - PROXIED=${PROXIED}
+    image: favonia/cloudflare-ddns:latest
+    # Choose the appropriate tag based on your need:
+    # - "latest" for the latest stable version (which could become 2.x.y
+    #   in the future and break things)
+    # - "1" for the latest stable version whose major version is 1
+    # - "1.x.y" to pin the specific version 1.x.y
     network_mode: host
-    dns: 
-      - ${DNS}
+    # This bypasses network isolation and makes IPv6 easier (optional; see below)
+    restart: always
+    # Restart the updater after reboot
+    user: "1000:994"
+    # Run the updater with specific user and group IDs (in that order).
+    # You can change the two numbers based on your need.
+    read_only: true
+    # Make the container filesystem read-only (optional but recommended)
+    cap_drop: [all]
+    # Drop all Linux capabilities (optional but recommended)
+    security_opt: [no-new-privileges:true]
+    # Another protection to restrict superuser privileges (optional but recommended)
+    env_file:
+      - .env
+    #environment:
+    #  - CLOUDFLARE_API_TOKEN=YOUR-CLOUDFLARE-API-TOKEN
+        # Your Cloudflare API token
+    #  - DOMAINS=example.org,www.example.org,example.io
+        # Your domains (separated by commas)
+    #  - PROXIED=true
+        # Tell Cloudflare to cache webpages and hide your IP (optional)
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+#networks:
+#  frontend:
+#    external: true
+#    enable_ipv6: true
+# Introduce custom Docker networks to the 'services' in this file. A common use case
+# for this is binding one of the 'services' to a specific network interface available at
+# Docker's host. This section is required for the 'networks' section of each 'services'.
